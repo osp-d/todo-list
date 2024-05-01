@@ -11,7 +11,7 @@ body {
 div.container {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) 3fr;
+  grid-template-columns: minmax(210px, 1fr) 3fr;
   grid-template-rows: 48px 1fr 32px;
 }
 
@@ -21,6 +21,13 @@ div.footer {
   background-color: rgb(203, 213, 225);
 }
 
+button.add-project,
+button.add-todo,
+button.project {
+  display: flex;
+  gap: 8px;
+}
+
 div.main {
   min-height: 100%;
   display: flex;
@@ -28,7 +35,14 @@ div.main {
   align-items: center;
 }
 
-div.todo-form {
+div.content {
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form.todo-form {
   min-width: 400px;
   margin: 12px;
   padding: 16px 24px;
@@ -39,7 +53,7 @@ div.todo-form {
   gap: 12px;
   background-color: rgb(229, 231, 235);
 
-  p {
+  label {
     margin: 0;
   }
 
@@ -54,7 +68,8 @@ div.form-controls {
   justify-content: center;
   gap: 12px;
 
-  button {
+  input.add,
+  input.cancel {
     color: white;
     font-weight: bold;
     height: 32px;
@@ -63,11 +78,11 @@ div.form-controls {
     border-radius: 4px;
   }
 
-  button.add {
+  input.add {
     background-color: rgb(16, 185, 129);
   }
 
-  button.cancel {
+  input.cancel {
     background-color: rgb(244, 63, 94);
   }
 }
@@ -93,11 +108,11 @@ button.add-todo {
 }
 
 button.project {
-  width: 100%;
+  width: 80%;
   text-align: left;
 }
 
-div.input-wrapper {
+div.new-project-wrapper {
   min-height: 24px;
   width: 80%;
   padding: 8px;
@@ -123,19 +138,38 @@ div.input-wrapper {
     border-radius: 4px;
   }
 
-  button.add {
+  button.submit-project {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
     background-color: rgb(16, 185, 129);
   }
 
-  button.cancel {
+  button.cancel-project {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
     background-color: rgb(244, 63, 94);
   }
 }
 
-div.invisible {
+form.invisible,
+button.invisible,
+.invisible {
   display: none;
+}
+
+div.todo-wrapper {
+  display: flex;
+  align-items: center;
+  min-width: 400px;
+  padding: 8px 24px;
+  margin: 8px 0px;
+  border-radius: 4px;
+  gap: 12px;
+  background-color: rgb(229, 231, 235);
+
+  p,
+  input {
+    font-weight: bold;
+    margin: 0;
+  }
 }
