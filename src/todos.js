@@ -1,6 +1,6 @@
 let projectsArray = [];
 
-class Project {
+export class Project {
   constructor(title) {
     this.title = title;
     this.storage = [];
@@ -8,53 +8,17 @@ class Project {
 
   deleteTodo(name) {
     this.storage.forEach((item) => {
-      if (item.title == name) {
+      if (item.index == name) {
         this.storage.splice([this.storage.indexOf(item)], 1);
-      }
-    });
-  }
-
-  showTodo(name) {
-    this.storage.forEach((item) => {
-      if (item.title == name) {
-        console.log(item);
-      }
-    });
-  }
-
-  changeTodoStatus(name) {
-    this.storage.forEach((item) => {
-      if (item.title == name) {
-        item.changeStatus();
-      }
-    });
-  }
-
-  editTodo(
-    name,
-    newTitle,
-    newDescription,
-    newDueDate,
-    newPriority,
-    newProject
-  ) {
-    this.storage.forEach((item) => {
-      if (item.title == name) {
-        item.edit(
-          newTitle,
-          newDescription,
-          newDueDate,
-          newPriority,
-          newProject
-        );
       }
     });
   }
 }
 
-class Todo {
-  constructor(title, description, dueDate, priority, project) {
+export class Todo {
+  constructor(title, index, description, dueDate, priority, project) {
     this.title = title;
+    this.index = index;
     this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
@@ -64,12 +28,14 @@ class Todo {
 
   edit(
     newTitle = this.title,
+    index,
     newDescription = this.description,
     newDueDate = this.dueDate,
     newPriority = this.priority,
     newProject = this.project
   ) {
     this.title = newTitle;
+    this.index = index;
     this.description = newDescription;
     this.dueDate = newDueDate;
     this.priority = newPriority;
@@ -85,21 +51,25 @@ class Todo {
   }
 }
 
-function addProject(name) {
+const addProject = function (name) {
+  let counter = 0;
+
   if (projectsArray.length == 0) {
     projectsArray.push(new Project(name));
   } else {
     projectsArray.forEach((item) => {
       if (item.title == name) {
-        console.log('Such project already exists');
-      } else {
-        projectsArray.push(new Project(name));
+        counter++;
       }
     });
-  }
-}
 
-function renameProject(name, newName) {
+    if (counter === 0) {
+      projectsArray.push(new Project(name));
+    }
+  }
+};
+
+const renameProject = function (name, newName) {
   projectsArray.forEach((item) => {
     if (item.title == name) {
       projectsArray.forEach((item) => {
@@ -111,21 +81,105 @@ function renameProject(name, newName) {
       });
     }
   });
-}
+};
 
-function deleteProject(name) {
+const deleteProject = function (name) {
   projectsArray.forEach((item) => {
     if (item.title == name) {
       projectsArray.splice([projectsArray.indexOf(item)], 1);
     }
   });
-}
+};
 
-function addTodo(title, description, dueDate, priority, project) {
-  let todo = new Todo(title, description, dueDate, priority, project);
+const addTodo = function (
+  title,
+  index,
+  description,
+  dueDate,
+  priority,
+  project
+) {
+  let todo = new Todo(title, index, description, dueDate, priority, project);
   projectsArray.forEach((item) => {
     if (item.title == project) {
       item.storage.push(todo);
     }
   });
-}
+  return todo;
+};
+
+const showTodo = function (projectName) {
+  let a;
+
+  console.log(projectName);
+
+  projectsArray.forEach((item) => {
+    if (item.title == projectName) {
+      console.log(item.storage);
+      a = item.storage;
+    }
+  });
+
+  return a;
+};
+
+const changeTodoStatus = function (name, projectName) {
+  let a;
+
+  projectsArray.forEach((item) => {
+    if (item.title == projectName) {
+      a = item.storage;
+    }
+  });
+
+  console.log(a);
+
+  a.forEach((item) => {
+    if (item.index == name) {
+      item.changeStatus();
+    }
+  });
+};
+
+const editTodo = function (
+  name,
+  projectName,
+  newTitle,
+  index,
+  newDescription,
+  newDueDate,
+  newPriority,
+  newProject
+) {
+  let a;
+
+  projectsArray.forEach((item) => {
+    if (item.title == projectName) {
+      a = item.storage;
+    }
+  });
+
+  a.forEach((item) => {
+    if (item.index == name) {
+      item.edit(
+        newTitle,
+        index,
+        newDescription,
+        newDueDate,
+        newPriority,
+        newProject
+      );
+    }
+  });
+};
+
+export {
+  addProject,
+  renameProject,
+  deleteProject,
+  addTodo,
+  showTodo,
+  changeTodoStatus,
+  editTodo,
+  projectsArray,
+};
