@@ -1,8 +1,10 @@
 let projectsArray = [];
+let allTodosArray = [];
 
 export class Project {
-  constructor(title) {
+  constructor(title, index) {
     this.title = title;
+    this.index = index;
     this.storage = [];
   }
 
@@ -51,11 +53,13 @@ export class Todo {
   }
 }
 
-const addProject = function (name) {
+const addProject = function (name, projectIndex) {
   let counter = 0;
+  let project = new Project(name, projectIndex);
 
   if (projectsArray.length == 0) {
-    projectsArray.push(new Project(name));
+    projectsArray.push(project);
+    return project;
   } else {
     projectsArray.forEach((item) => {
       if (item.title == name) {
@@ -64,7 +68,8 @@ const addProject = function (name) {
     });
 
     if (counter === 0) {
-      projectsArray.push(new Project(name));
+      projectsArray.push(project);
+      return project;
     }
   }
 };
@@ -84,11 +89,26 @@ const renameProject = function (name, newName) {
 };
 
 const deleteProject = function (name) {
+  let a = 'value';
+  let b;
+
   projectsArray.forEach((item) => {
-    if (item.title == name) {
-      projectsArray.splice([projectsArray.indexOf(item)], 1);
+    if (item.index == name) {
+      a = item.storage;
+      b = projectsArray.indexOf(item);
     }
   });
+
+  for (let i = 0; i < allTodosArray.length; i++) {
+    a.forEach((todo) => {
+      if (allTodosArray[i].index == todo.index) {
+        allTodosArray.splice([i], 1);
+        i - 1;
+      }
+    });
+  }
+
+  projectsArray.splice([b], 1);
 };
 
 const addTodo = function (
@@ -103,13 +123,14 @@ const addTodo = function (
   projectsArray.forEach((item) => {
     if (item.title == project) {
       item.storage.push(todo);
+      allTodosArray.push(todo);
     }
   });
   return todo;
 };
 
 const showTodo = function (projectName) {
-  let a;
+  let a = 'value';
 
   console.log(projectName);
 
@@ -120,7 +141,11 @@ const showTodo = function (projectName) {
     }
   });
 
-  return a;
+  if (a === 'value') {
+    console.log('No such project');
+  } else {
+    return a;
+  }
 };
 
 const changeTodoStatus = function (name, projectName) {
@@ -173,6 +198,22 @@ const editTodo = function (
   });
 };
 
+const deleteTodo = function (projectIndex, index) {
+  projectsArray.forEach((item) => {
+    if (item.index == projectIndex) {
+      item.deleteTodo(index);
+    }
+  });
+
+  allTodosArray.forEach((item) => {
+    if (item.index == index) {
+      allTodosArray.splice([allTodosArray.indexOf(item)], 1);
+    }
+  });
+
+  console.log(allTodosArray);
+};
+
 export {
   addProject,
   renameProject,
@@ -181,5 +222,7 @@ export {
   showTodo,
   changeTodoStatus,
   editTodo,
+  deleteTodo,
+  allTodosArray,
   projectsArray,
 };

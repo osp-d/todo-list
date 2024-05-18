@@ -5,6 +5,8 @@ import {
   addTodo,
   showTodo,
   changeTodoStatus,
+  deleteTodo,
+  allTodosArray,
   projectsArray,
 } from './todos.js';
 
@@ -15,9 +17,10 @@ import {
 
 let currentProject;
 let todoIndex = 0;
+let projectIndex = 0;
 
 const sidebar = document.querySelector('div.sidebar');
-// const main = document.querySelector('div.main');
+const projectBtnsArea = document.querySelector('div.user-projects');
 const addProjectBtn = document.querySelector('button.add-project');
 const todoForm = document.querySelector('form.todo-form');
 const cancelFormBtn = document.querySelector('input.cancel');
@@ -30,6 +33,76 @@ const addTodoBtn = document.createElement('button');
 const plusIcon = document.querySelector('svg.plus');
 const plusIconCopy = plusIcon.cloneNode(true);
 const todoMainSpace = document.querySelector('div.content');
+const allTodosBtn = document.querySelector('div.all-todos');
+
+addHover(allTodosBtn, '#f3f4f6', 'transparent');
+
+allTodosBtn.addEventListener('click', () => {
+  while (todoMainSpace.firstChild) {
+    todoMainSpace.removeChild(todoMainSpace.lastChild);
+  }
+
+  allTodosArray.forEach((element) => {
+    const todoWrapper = document.createElement('div');
+    todoWrapper.classList.add('todo-wrapper');
+    const checkTodo = document.createElement('input');
+    checkTodo.setAttribute('type', 'checkbox');
+    const todoName = document.createElement('p');
+    todoName.textContent = element.title;
+    const todoDate = document.createElement('p');
+    todoDate.textContent = element.dueDate;
+    const todoPriority = document.createElement('p');
+    todoPriority.textContent = element.priority;
+    const deleteTodoBtn = document.createElement('button');
+    deleteTodoBtn.textContent = 'Delete';
+    deleteTodoBtn.classList.add('delete-todo');
+
+    if (element.status == 'Complete') {
+      checkTodo.checked = true;
+      todoName.style.textDecorationLine = 'line-through';
+      todoDate.style.textDecorationLine = 'line-through';
+      todoPriority.style.textDecorationLine = 'line-through';
+      todoWrapper.style.opacity = '0.8';
+    }
+
+    checkTodo.addEventListener('click', () => {
+      changeTodoStatus(element.index, currentProject);
+
+      if (element.status == 'Complete') {
+        checkTodo.checked = true;
+        todoName.style.textDecorationLine = 'line-through';
+        todoDate.style.textDecorationLine = 'line-through';
+        todoPriority.style.textDecorationLine = 'line-through';
+        todoWrapper.style.opacity = '0.8';
+      } else {
+        checkTodo.checked = false;
+        todoName.style.textDecorationLine = 'none';
+        todoDate.style.textDecorationLine = 'none';
+        todoPriority.style.textDecorationLine = 'none';
+        todoWrapper.style.opacity = '1';
+      }
+    });
+
+    switch (element.priority) {
+      case 'Low':
+        todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
+        break;
+      case 'Medium':
+        todoWrapper.style.backgroundColor = 'rgb(255 237 214)';
+        break;
+      case 'High':
+        todoWrapper.style.backgroundColor = 'rgb(255 214 214)';
+        break;
+    }
+
+    todoWrapper.appendChild(checkTodo);
+    todoWrapper.appendChild(todoName);
+    todoWrapper.appendChild(todoDate);
+    todoWrapper.appendChild(todoPriority);
+    todoWrapper.appendChild(deleteTodoBtn);
+    todoMainSpace.prepend(todoWrapper);
+  });
+});
 
 addHover(addProjectBtn, '#f3f4f6', 'transparent');
 
@@ -53,22 +126,35 @@ addProjectBtn.addEventListener('click', () => {
 
 submitProjectBtn.addEventListener('click', () => {
   const projectName = document.querySelector('#input-project').value;
-  addProject(projectName);
+  projectIndex = projectIndex + 1;
+
+  let element = addProject(projectName, projectIndex);
 
   const projectMenuIconCopy = projectMenuIcon.cloneNode(true);
-  const projectBtn = document.createElement('button');
+  const projectBtn = document.createElement('div');
   projectBtn.classList.add('project');
   projectBtn.textContent = projectName;
+  const deleteProjectBtn = document.createElement('button');
+  deleteProjectBtn.classList.add('delete-project');
+  deleteProjectBtn.textContent = 'delete';
   projectBtn.prepend(projectMenuIconCopy);
+  projectBtn.appendChild(deleteProjectBtn);
   projectMenuIconCopy.classList.remove('invisible');
+
+  deleteProjectBtn.addEventListener('click', () => {
+    deleteProject(element.index);
+    projectBtnsArea.removeChild(projectBtn);
+
+    console.log(projectsArray);
+  });
 
   addHover(projectBtn, '#f3f4f6', 'transparent');
 
-  switchProject(projectBtn, projectName);
+  switchProject(projectBtn, projectIndex);
 
   inputProject.value = '';
   sidebar.removeChild(newProjectWrapper);
-  sidebar.prepend(projectBtn);
+  projectBtnsArea.prepend(projectBtn);
 
   console.log(projectsArray);
 });
@@ -130,6 +216,12 @@ todoForm.addEventListener('submit', (event) => {
         todoPriority.style.textDecorationLine = 'none';
         todoWrapper.style.opacity = '1';
       }
+    });
+
+    deleteTodoBtn.addEventListener('click', () => {
+      deleteTodo(currentProject, element.index);
+      todoMainSpace.removeChild(todoWrapper);
+      console.log(projectsArray);
     });
 
     console.log(element);
@@ -197,31 +289,22 @@ function switchProject(valueBtn, value) {
     valueBtn.style.backgroundColor = '#7dd3fc';
 
     let projectStorage = showTodo(currentProject);
-    projectStorage.forEach((element) => {
-      const todoWrapper = document.createElement('div');
-      todoWrapper.classList.add('todo-wrapper');
-      const checkTodo = document.createElement('input');
-      checkTodo.setAttribute('type', 'checkbox');
-      const todoName = document.createElement('p');
-      todoName.textContent = element.title;
-      const todoDate = document.createElement('p');
-      todoDate.textContent = element.dueDate;
-      const todoPriority = document.createElement('p');
-      todoPriority.textContent = element.priority;
-      const deleteTodoBtn = document.createElement('button');
-      deleteTodoBtn.textContent = 'Delete';
-      deleteTodoBtn.classList.add('delete-todo');
 
-      if (element.status == 'Complete') {
-        checkTodo.checked = true;
-        todoName.style.textDecorationLine = 'line-through';
-        todoDate.style.textDecorationLine = 'line-through';
-        todoPriority.style.textDecorationLine = 'line-through';
-        todoWrapper.style.opacity = '0.8';
-      }
-
-      checkTodo.addEventListener('click', () => {
-        changeTodoStatus(element.index, currentProject);
+    if (typeof projectStorage === 'object') {
+      projectStorage.forEach((element) => {
+        const todoWrapper = document.createElement('div');
+        todoWrapper.classList.add('todo-wrapper');
+        const checkTodo = document.createElement('input');
+        checkTodo.setAttribute('type', 'checkbox');
+        const todoName = document.createElement('p');
+        todoName.textContent = element.title;
+        const todoDate = document.createElement('p');
+        todoDate.textContent = element.dueDate;
+        const todoPriority = document.createElement('p');
+        todoPriority.textContent = element.priority;
+        const deleteTodoBtn = document.createElement('button');
+        deleteTodoBtn.textContent = 'Delete';
+        deleteTodoBtn.classList.add('delete-todo');
 
         if (element.status == 'Complete') {
           checkTodo.checked = true;
@@ -229,34 +312,52 @@ function switchProject(valueBtn, value) {
           todoDate.style.textDecorationLine = 'line-through';
           todoPriority.style.textDecorationLine = 'line-through';
           todoWrapper.style.opacity = '0.8';
-        } else {
-          checkTodo.checked = false;
-          todoName.style.textDecorationLine = 'none';
-          todoDate.style.textDecorationLine = 'none';
-          todoPriority.style.textDecorationLine = 'none';
-          todoWrapper.style.opacity = '1';
         }
+
+        checkTodo.addEventListener('click', () => {
+          changeTodoStatus(element.index, currentProject);
+
+          if (element.status == 'Complete') {
+            checkTodo.checked = true;
+            todoName.style.textDecorationLine = 'line-through';
+            todoDate.style.textDecorationLine = 'line-through';
+            todoPriority.style.textDecorationLine = 'line-through';
+            todoWrapper.style.opacity = '0.8';
+          } else {
+            checkTodo.checked = false;
+            todoName.style.textDecorationLine = 'none';
+            todoDate.style.textDecorationLine = 'none';
+            todoPriority.style.textDecorationLine = 'none';
+            todoWrapper.style.opacity = '1';
+          }
+        });
+
+        deleteTodoBtn.addEventListener('click', () => {
+          deleteTodo(currentProject, element.index);
+          todoMainSpace.removeChild(todoWrapper);
+          console.log(projectsArray);
+        });
+
+        switch (element.priority) {
+          case 'Low':
+            todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
+            break;
+          case 'Medium':
+            todoWrapper.style.backgroundColor = 'rgb(255 237 214)';
+            break;
+          case 'High':
+            todoWrapper.style.backgroundColor = 'rgb(255 214 214)';
+            break;
+        }
+
+        todoWrapper.appendChild(checkTodo);
+        todoWrapper.appendChild(todoName);
+        todoWrapper.appendChild(todoDate);
+        todoWrapper.appendChild(todoPriority);
+        todoWrapper.appendChild(deleteTodoBtn);
+        todoMainSpace.prepend(todoWrapper);
       });
-
-      switch (element.priority) {
-        case 'Low':
-          todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
-          break;
-        case 'Medium':
-          todoWrapper.style.backgroundColor = 'rgb(255 237 214)';
-          break;
-        case 'High':
-          todoWrapper.style.backgroundColor = 'rgb(255 214 214)';
-          break;
-      }
-
-      todoWrapper.appendChild(checkTodo);
-      todoWrapper.appendChild(todoName);
-      todoWrapper.appendChild(todoDate);
-      todoWrapper.appendChild(todoPriority);
-      todoWrapper.appendChild(deleteTodoBtn);
-      todoMainSpace.prepend(todoWrapper);
-    });
+    }
 
     renderAddTodo();
   });
