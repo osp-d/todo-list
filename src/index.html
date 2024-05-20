@@ -5,12 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ToDo List</title>
     <link rel="stylesheet" href="style.css" />
+    <script type="module" src="user-interface.js"></script>
   </head>
   <body>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="24"
+      viewBox="0 -960 960 960"
+      width="24"
+      class="invisible menu"
+    >
+      <path
+        d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"
+      />
+    </svg>
+
     <div class="container">
       <div class="header"></div>
-      <div class="sidebar"></div>
-      <div class="main"></div>
+      <div class="sidebar">
+        <div class="project all-todos">All todos</div>
+        <div class="user-projects">
+          <button class="add-project">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24"
+              viewBox="0 -960 960 960"
+              width="24"
+              class="plus"
+            >
+              <path
+                d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"
+              />
+            </svg>
+            Add Project
+          </button>
+        </div>
+      </div>
+      <div class="main">
+        <div class="content"></div>
+        <form action="" class="todo-form invisible" id="edit-todo-form">
+          <label for="title">Title:</label>
+          <input
+            type="text"
+            placeholder="What to do?"
+            id="edit-title"
+            name="title"
+            required
+          />
+          <label for="description">Description (optional):</label>
+          <textarea
+            placeholder="Go plant a tree"
+            cols="30"
+            rows="5"
+            name="description"
+            id="edit-description"
+          ></textarea>
+          <label for="date">Date:</label>
+          <input type="date" name="date" id="edit-date" required />
+          <label for="priority">Priority:</label>
+          <select name="priority" id="edit-priority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <div class="form-controls">
+            <input type="submit" class="add" value="Add" />
+            <input
+              type="button"
+              class="cancel"
+              value="Cancel"
+              id="cancel-edit-todo"
+            />
+          </div>
+        </form>
+
+        <form action="" class="todo-form invisible" id="new-todo-form">
+          <label for="title">Title:</label>
+          <input
+            type="text"
+            placeholder="What to do?"
+            id="title"
+            name="title"
+            required
+          />
+          <label for="description">Description (optional):</label>
+          <textarea
+            placeholder="Go plant a tree"
+            cols="30"
+            rows="5"
+            name="description"
+            id="description"
+          ></textarea>
+          <label for="date">Date:</label>
+          <input type="date" name="date" id="date" required />
+          <label for="priority">Priority:</label>
+          <select name="priority" id="priority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <div class="form-controls">
+            <input type="submit" class="add" value="Add" id="submit-new-todo" />
+            <input
+              type="button"
+              class="cancel"
+              value="Cancel"
+              id="cancel-new-todo"
+            />
+          </div>
+        </form>
+      </div>
       <div class="footer"></div>
     </div>
   </body>
