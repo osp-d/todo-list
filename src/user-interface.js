@@ -3,27 +3,28 @@ import {
   renameProject,
   deleteProject,
   addTodo,
-  showTodo,
+  getProject,
   changeTodoStatus,
+  editTodo,
   deleteTodo,
   allTodosArray,
   projectsArray,
 } from './todos.js';
 
-// import { Todo } from './todos.js';
-// import { Project } from './todos.js';
-
 // Creating DOM elements
 
-let currentProject;
+let currentProjectIndex;
 let todoIndex = 0;
 let projectIndex = 0;
+let delivery;
 
 const sidebar = document.querySelector('div.sidebar');
 const projectBtnsArea = document.querySelector('div.user-projects');
 const addProjectBtn = document.querySelector('button.add-project');
-const todoForm = document.querySelector('form.todo-form');
-const cancelFormBtn = document.querySelector('input.cancel');
+const todoForm = document.querySelector('form#new-todo-form');
+const editTodoForm = document.querySelector('form#edit-todo-form');
+const cancelNewTodoFormBtn = document.querySelector('input#cancel-new-todo');
+const cancelEditTodoFormBtn = document.querySelector('input#cancel-edit-todo');
 const projectMenuIcon = document.querySelector('svg.menu');
 const newProjectWrapper = document.createElement('div');
 const inputProject = document.createElement('input');
@@ -56,6 +57,9 @@ allTodosBtn.addEventListener('click', () => {
     const deleteTodoBtn = document.createElement('button');
     deleteTodoBtn.textContent = 'Delete';
     deleteTodoBtn.classList.add('delete-todo');
+    const editTodoBtn = document.createElement('button');
+    editTodoBtn.textContent = 'Edit';
+    editTodoBtn.classList.add('edit-todo');
 
     if (element.status == 'Complete') {
       checkTodo.checked = true;
@@ -66,7 +70,8 @@ allTodosBtn.addEventListener('click', () => {
     }
 
     checkTodo.addEventListener('click', () => {
-      changeTodoStatus(element.index, currentProject);
+      console.log(currentProjectIndex);
+      changeTodoStatus(element.index, currentProjectIndex);
 
       if (element.status == 'Complete') {
         checkTodo.checked = true;
@@ -81,6 +86,15 @@ allTodosBtn.addEventListener('click', () => {
         todoPriority.style.textDecorationLine = 'none';
         todoWrapper.style.opacity = '1';
       }
+    });
+
+    editTodoBtn.addEventListener('click', () => {
+      todoForm.classList.add('invisible');
+      todoForm.reset();
+      editTodoForm.classList.remove('invisible');
+      delivery = new formStorage(element.index);
+
+      console.log(projectsArray);
     });
 
     switch (element.priority) {
@@ -99,6 +113,7 @@ allTodosBtn.addEventListener('click', () => {
     todoWrapper.appendChild(todoName);
     todoWrapper.appendChild(todoDate);
     todoWrapper.appendChild(todoPriority);
+    todoWrapper.appendChild(editTodoBtn);
     todoWrapper.appendChild(deleteTodoBtn);
     todoMainSpace.prepend(todoWrapper);
   });
@@ -172,7 +187,7 @@ todoForm.addEventListener('submit', (event) => {
   } else {
     const title = document.querySelector('#title').value;
     const description = document.querySelector('#description').value;
-    const priority = document.querySelector('select').value;
+    const priority = document.querySelector('#priority').value;
     const date = document.querySelector('#date').value;
 
     todoIndex = todoIndex + 1;
@@ -183,25 +198,32 @@ todoForm.addEventListener('submit', (event) => {
       description,
       date,
       priority,
-      currentProject
+      currentProjectIndex
     );
 
     const todoWrapper = document.createElement('div');
     todoWrapper.classList.add('todo-wrapper');
+    todoWrapper.setAttribute('id', `todo-${todoIndex}`);
     const checkTodo = document.createElement('input');
     checkTodo.setAttribute('type', 'checkbox');
     const todoName = document.createElement('p');
+    todoName.setAttribute('id', `title-${todoIndex}`);
     todoName.textContent = element.title;
     const todoDate = document.createElement('p');
     todoDate.textContent = element.dueDate;
+    todoDate.setAttribute('id', `date-${todoIndex}`);
     const todoPriority = document.createElement('p');
     todoPriority.textContent = element.priority;
+    todoPriority.setAttribute('id', `priority-${todoIndex}`);
     const deleteTodoBtn = document.createElement('button');
     deleteTodoBtn.textContent = 'Delete';
     deleteTodoBtn.classList.add('delete-todo');
+    const editTodoBtn = document.createElement('button');
+    editTodoBtn.textContent = 'Edit';
+    editTodoBtn.classList.add('edit-todo');
 
     checkTodo.addEventListener('click', () => {
-      changeTodoStatus(todoIndex, currentProject);
+      changeTodoStatus(element.index, currentProjectIndex);
 
       if (element.status == 'Complete') {
         checkTodo.checked = true;
@@ -219,8 +241,17 @@ todoForm.addEventListener('submit', (event) => {
     });
 
     deleteTodoBtn.addEventListener('click', () => {
-      deleteTodo(currentProject, element.index);
+      deleteTodo(currentProjectIndex, element.index);
       todoMainSpace.removeChild(todoWrapper);
+      console.log(projectsArray);
+    });
+
+    editTodoBtn.addEventListener('click', () => {
+      todoForm.classList.add('invisible');
+      todoForm.reset();
+      editTodoForm.classList.remove('invisible');
+      delivery = new formStorage(element.index);
+
       console.log(projectsArray);
     });
 
@@ -242,6 +273,7 @@ todoForm.addEventListener('submit', (event) => {
     todoWrapper.appendChild(todoName);
     todoWrapper.appendChild(todoDate);
     todoWrapper.appendChild(todoPriority);
+    todoWrapper.appendChild(editTodoBtn);
     todoWrapper.appendChild(deleteTodoBtn);
     todoMainSpace.prepend(todoWrapper);
 
@@ -251,10 +283,80 @@ todoForm.addEventListener('submit', (event) => {
   }
 });
 
-cancelFormBtn.addEventListener('click', () => {
+cancelNewTodoFormBtn.addEventListener('click', () => {
   todoForm.reset();
   addTodoBtn.classList.remove('invisible');
   todoForm.classList.add('invisible');
+});
+
+class formStorage {
+  constructor(eIndex) {
+    this.eIndex = eIndex;
+  }
+
+  get storage() {
+    return this.eIndex;
+  }
+}
+
+editTodoForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  if (editTodoForm.checkValidity() === false) {
+    editTodoForm.reportValidity();
+    return;
+  } else {
+    const priority = document.querySelector('#edit-priority').value;
+    const editTitle = document.querySelector('#edit-title').value;
+    const editDescription = document.querySelector('#edit-description').value;
+    const editPriority = document.querySelector('#edit-priority').value;
+    const editDate = document.querySelector('#edit-date').value;
+
+    let receiver = delivery.storage;
+
+    const element = editTodo(
+      projectIndex,
+      editTitle,
+      receiver,
+      editDescription,
+      editPriority,
+      editDate,
+      projectIndex
+    );
+
+    console.log(element);
+
+    const todoWrapper = document.querySelector(`#todo-${element.index}`);
+    const todoName = document.querySelector(`#title-${element.index}`);
+    const todoDate = document.querySelector(`#date-${element.index}`);
+    const todoPriority = document.querySelector(`#priority-${element.index}`);
+
+    switch (priority) {
+      case 'Low':
+        todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
+        break;
+      case 'Medium':
+        todoWrapper.style.backgroundColor = 'rgb(255 237 214)';
+        break;
+      case 'High':
+        todoWrapper.style.backgroundColor = 'rgb(255 214 214)';
+        break;
+    }
+
+    todoName.textContent = element.title;
+    todoDate.textContent = element.dueDate;
+    todoPriority.textContent = element.priority;
+
+    editTodoForm.reset();
+    editTodoForm.classList.add('invisible');
+
+    console.log(projectsArray);
+  }
+});
+
+cancelEditTodoFormBtn.addEventListener('click', () => {
+  editTodoForm.reset();
+  editTodoForm.classList.add('invisible');
 });
 
 function renderAddTodo() {
@@ -264,6 +366,8 @@ function renderAddTodo() {
   addHover(addTodoBtn, '#f3f4f6', 'transparent');
 
   addTodoBtn.addEventListener('click', () => {
+    editTodoForm.classList.add('invisible');
+    editTodoForm.reset();
     todoForm.classList.remove('invisible');
     addTodoBtn.classList.add('invisible');
   });
@@ -285,10 +389,10 @@ function switchProject(valueBtn, value) {
       todoMainSpace.removeChild(todoMainSpace.lastChild);
     }
 
-    currentProject = value;
+    currentProjectIndex = value;
     valueBtn.style.backgroundColor = '#7dd3fc';
 
-    let projectStorage = showTodo(currentProject);
+    let projectStorage = getProject(currentProjectIndex);
 
     if (typeof projectStorage === 'object') {
       projectStorage.forEach((element) => {
@@ -305,6 +409,9 @@ function switchProject(valueBtn, value) {
         const deleteTodoBtn = document.createElement('button');
         deleteTodoBtn.textContent = 'Delete';
         deleteTodoBtn.classList.add('delete-todo');
+        const editTodoBtn = document.createElement('button');
+        editTodoBtn.textContent = 'Edit';
+        editTodoBtn.classList.add('edit-todo');
 
         if (element.status == 'Complete') {
           checkTodo.checked = true;
@@ -315,7 +422,7 @@ function switchProject(valueBtn, value) {
         }
 
         checkTodo.addEventListener('click', () => {
-          changeTodoStatus(element.index, currentProject);
+          changeTodoStatus(element.index, currentProjectIndex);
 
           if (element.status == 'Complete') {
             checkTodo.checked = true;
@@ -333,8 +440,17 @@ function switchProject(valueBtn, value) {
         });
 
         deleteTodoBtn.addEventListener('click', () => {
-          deleteTodo(currentProject, element.index);
+          deleteTodo(currentProjectIndex, element.index);
           todoMainSpace.removeChild(todoWrapper);
+          console.log(projectsArray);
+        });
+
+        editTodoBtn.addEventListener('click', () => {
+          todoForm.classList.add('invisible');
+          todoForm.reset();
+          editTodoForm.classList.remove('invisible');
+          delivery = new formStorage(element.index);
+
           console.log(projectsArray);
         });
 
@@ -354,6 +470,7 @@ function switchProject(valueBtn, value) {
         todoWrapper.appendChild(todoName);
         todoWrapper.appendChild(todoDate);
         todoWrapper.appendChild(todoPriority);
+        todoWrapper.appendChild(editTodoBtn);
         todoWrapper.appendChild(deleteTodoBtn);
         todoMainSpace.prepend(todoWrapper);
       });
