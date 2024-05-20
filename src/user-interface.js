@@ -46,14 +46,18 @@ allTodosBtn.addEventListener('click', () => {
   allTodosArray.forEach((element) => {
     const todoWrapper = document.createElement('div');
     todoWrapper.classList.add('todo-wrapper');
+    todoWrapper.setAttribute('id', `todo-${element.index}`);
     const checkTodo = document.createElement('input');
     checkTodo.setAttribute('type', 'checkbox');
     const todoName = document.createElement('p');
     todoName.textContent = element.title;
+    todoName.setAttribute('id', `title-${element.index}`);
     const todoDate = document.createElement('p');
     todoDate.textContent = element.dueDate;
+    todoDate.setAttribute('id', `date-${element.index}`);
     const todoPriority = document.createElement('p');
     todoPriority.textContent = element.priority;
+    todoPriority.setAttribute('id', `priority-${element.index}`);
     const deleteTodoBtn = document.createElement('button');
     deleteTodoBtn.textContent = 'Delete';
     deleteTodoBtn.classList.add('delete-todo');
@@ -70,6 +74,7 @@ allTodosBtn.addEventListener('click', () => {
     }
 
     checkTodo.addEventListener('click', () => {
+      currentProjectIndex = element.project;
       console.log(currentProjectIndex);
       changeTodoStatus(element.index, currentProjectIndex);
 
@@ -89,11 +94,19 @@ allTodosBtn.addEventListener('click', () => {
     });
 
     editTodoBtn.addEventListener('click', () => {
+      currentProjectIndex = element.project;
       todoForm.classList.add('invisible');
       todoForm.reset();
       editTodoForm.classList.remove('invisible');
       delivery = new formStorage(element.index);
 
+      console.log(projectsArray);
+    });
+
+    deleteTodoBtn.addEventListener('click', () => {
+      currentProjectIndex = element.project;
+      deleteTodo(currentProjectIndex, element.index);
+      todoMainSpace.removeChild(todoWrapper);
       console.log(projectsArray);
     });
 
@@ -257,7 +270,7 @@ todoForm.addEventListener('submit', (event) => {
 
     console.log(element);
 
-    switch (priority) {
+    switch (element.priority) {
       case 'Low':
         todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
         break;
@@ -306,7 +319,6 @@ editTodoForm.addEventListener('submit', (event) => {
     editTodoForm.reportValidity();
     return;
   } else {
-    const priority = document.querySelector('#edit-priority').value;
     const editTitle = document.querySelector('#edit-title').value;
     const editDescription = document.querySelector('#edit-description').value;
     const editPriority = document.querySelector('#edit-priority').value;
@@ -315,13 +327,13 @@ editTodoForm.addEventListener('submit', (event) => {
     let receiver = delivery.storage;
 
     const element = editTodo(
-      projectIndex,
+      currentProjectIndex,
       editTitle,
       receiver,
       editDescription,
-      editPriority,
       editDate,
-      projectIndex
+      editPriority,
+      currentProjectIndex
     );
 
     console.log(element);
@@ -331,7 +343,7 @@ editTodoForm.addEventListener('submit', (event) => {
     const todoDate = document.querySelector(`#date-${element.index}`);
     const todoPriority = document.querySelector(`#priority-${element.index}`);
 
-    switch (priority) {
+    switch (element.priority) {
       case 'Low':
         todoWrapper.style.backgroundColor = 'rgb(214 255 226)';
         break;
@@ -398,14 +410,18 @@ function switchProject(valueBtn, value) {
       projectStorage.forEach((element) => {
         const todoWrapper = document.createElement('div');
         todoWrapper.classList.add('todo-wrapper');
+        todoWrapper.setAttribute('id', `todo-${element.index}`);
         const checkTodo = document.createElement('input');
         checkTodo.setAttribute('type', 'checkbox');
         const todoName = document.createElement('p');
         todoName.textContent = element.title;
+        todoName.setAttribute('id', `title-${element.index}`);
         const todoDate = document.createElement('p');
         todoDate.textContent = element.dueDate;
+        todoDate.setAttribute('id', `date-${element.index}`);
         const todoPriority = document.createElement('p');
         todoPriority.textContent = element.priority;
+        todoPriority.setAttribute('id', `priority-${element.index}`);
         const deleteTodoBtn = document.createElement('button');
         deleteTodoBtn.textContent = 'Delete';
         deleteTodoBtn.classList.add('delete-todo');
