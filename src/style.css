@@ -21,13 +21,6 @@ div.footer {
   background-color: rgb(203, 213, 225);
 }
 
-button.add-project,
-button.add-todo,
-button.project {
-  display: flex;
-  gap: 8px;
-}
-
 div.main {
   min-height: 100%;
   display: flex;
@@ -36,6 +29,7 @@ div.main {
 }
 
 div.content {
+  margin: 12px 0px;
   min-width: 100%;
   display: flex;
   flex-direction: column;
@@ -94,10 +88,19 @@ div.sidebar {
   align-items: center;
 }
 
+div.user-projects {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 button.add-project,
-button.project,
-button.add-todo {
+button.add-todo,
+div.project {
+  display: flex;
   width: 80%;
+  gap: 8px;
   margin: 8px 0px;
   padding: 8px;
   font-size: 20px;
@@ -107,8 +110,15 @@ button.add-todo {
   background-color: transparent;
 }
 
-button.project {
-  width: 80%;
+button.delete-project {
+  font-weight: bold;
+  color: white;
+  background-color: rgb(244, 63, 94);
+  border: none;
+  border-radius: 4px;
+}
+
+div.project {
   text-align: left;
 }
 
@@ -160,7 +170,7 @@ button.invisible,
 div.todo-wrapper {
   display: flex;
   align-items: center;
-  min-width: 400px;
+  min-width: 600px;
   padding: 8px 24px;
   margin: 8px 0px;
   border-radius: 4px;
@@ -172,4 +182,21 @@ div.todo-wrapper {
     font-weight: bold;
     margin: 0;
   }
+
+  .delete-todo,
+  .edit-todo {
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+}
+
+.delete-todo {
+  background-color: rgb(244, 63, 94);
+}
+
+.edit-todo {
+  background-color: rgb(156, 163, 175);
 }
