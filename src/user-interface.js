@@ -1,22 +1,30 @@
 import {
   addProject,
-  renameProject,
   deleteProject,
   addTodo,
   getProject,
   changeTodoStatus,
   editTodo,
   deleteTodo,
+  setProjectIndex,
+  getProjectIndex,
   allTodosArray,
-  projectsArray,
 } from './todos.js';
+
+import './style.css';
 
 // Creating DOM elements
 
 let currentProjectIndex;
 let todoIndex = 0;
-let projectIndex = 0;
+let projectIndex;
 let delivery;
+
+if (getProjectIndex() === null) {
+  projectIndex = 0;
+} else {
+  projectIndex = getProjectIndex();
+}
 
 const sidebar = document.querySelector('div.sidebar');
 const projectBtnsArea = document.querySelector('div.user-projects');
@@ -76,9 +84,9 @@ allTodosBtn.addEventListener('click', () => {
     checkTodo.addEventListener('click', () => {
       currentProjectIndex = element.project;
       console.log(currentProjectIndex);
-      changeTodoStatus(element.index, currentProjectIndex);
+      let todo = changeTodoStatus(element.index, currentProjectIndex);
 
-      if (element.status == 'Complete') {
+      if (todo.status == 'Complete') {
         checkTodo.checked = true;
         todoName.style.textDecorationLine = 'line-through';
         todoDate.style.textDecorationLine = 'line-through';
@@ -99,15 +107,12 @@ allTodosBtn.addEventListener('click', () => {
       todoForm.reset();
       editTodoForm.classList.remove('invisible');
       delivery = new formStorage(element.index);
-
-      console.log(projectsArray);
     });
 
     deleteTodoBtn.addEventListener('click', () => {
       currentProjectIndex = element.project;
       deleteTodo(currentProjectIndex, element.index);
       todoMainSpace.removeChild(todoWrapper);
-      console.log(projectsArray);
     });
 
     switch (element.priority) {
@@ -148,6 +153,37 @@ newProjectWrapper.appendChild(inputProject);
 newProjectWrapper.appendChild(submitProjectBtn);
 newProjectWrapper.appendChild(cancelProjectBtn);
 
+if (localStorage.length != 0) {
+  let localKeys = Object.keys(localStorage);
+  localKeys.forEach((key) => {
+    if (parseInt(key) > -1) {
+      let project = JSON.parse(localStorage.getItem(key));
+
+      const projectMenuIconCopy = projectMenuIcon.cloneNode(true);
+      const projectBtn = document.createElement('div');
+      projectBtn.classList.add('project');
+      projectBtn.textContent = project.title;
+      const deleteProjectBtn = document.createElement('button');
+      deleteProjectBtn.classList.add('delete-project');
+      deleteProjectBtn.textContent = 'delete';
+      projectBtn.prepend(projectMenuIconCopy);
+      projectBtn.appendChild(deleteProjectBtn);
+      projectMenuIconCopy.classList.remove('invisible');
+
+      deleteProjectBtn.addEventListener('click', () => {
+        deleteProject(key);
+        projectBtnsArea.removeChild(projectBtn);
+      });
+
+      addHover(projectBtn, '#f3f4f6', 'transparent');
+
+      switchProject(projectBtn, key);
+
+      projectBtnsArea.prepend(projectBtn);
+    }
+  });
+}
+
 addProjectBtn.addEventListener('click', () => {
   sidebar.append(newProjectWrapper);
 });
@@ -155,6 +191,7 @@ addProjectBtn.addEventListener('click', () => {
 submitProjectBtn.addEventListener('click', () => {
   const projectName = document.querySelector('#input-project').value;
   projectIndex = projectIndex + 1;
+  setProjectIndex(projectIndex);
 
   let element = addProject(projectName, projectIndex);
 
@@ -172,8 +209,6 @@ submitProjectBtn.addEventListener('click', () => {
   deleteProjectBtn.addEventListener('click', () => {
     deleteProject(element.index);
     projectBtnsArea.removeChild(projectBtn);
-
-    console.log(projectsArray);
   });
 
   addHover(projectBtn, '#f3f4f6', 'transparent');
@@ -183,8 +218,6 @@ submitProjectBtn.addEventListener('click', () => {
   inputProject.value = '';
   sidebar.removeChild(newProjectWrapper);
   projectBtnsArea.prepend(projectBtn);
-
-  console.log(projectsArray);
 });
 
 cancelProjectBtn.addEventListener('click', () => {
@@ -236,9 +269,9 @@ todoForm.addEventListener('submit', (event) => {
     editTodoBtn.classList.add('edit-todo');
 
     checkTodo.addEventListener('click', () => {
-      changeTodoStatus(element.index, currentProjectIndex);
+      let todo = changeTodoStatus(element.index, currentProjectIndex);
 
-      if (element.status == 'Complete') {
+      if (todo.status == 'Complete') {
         checkTodo.checked = true;
         todoName.style.textDecorationLine = 'line-through';
         todoDate.style.textDecorationLine = 'line-through';
@@ -256,7 +289,6 @@ todoForm.addEventListener('submit', (event) => {
     deleteTodoBtn.addEventListener('click', () => {
       deleteTodo(currentProjectIndex, element.index);
       todoMainSpace.removeChild(todoWrapper);
-      console.log(projectsArray);
     });
 
     editTodoBtn.addEventListener('click', () => {
@@ -264,8 +296,6 @@ todoForm.addEventListener('submit', (event) => {
       todoForm.reset();
       editTodoForm.classList.remove('invisible');
       delivery = new formStorage(element.index);
-
-      console.log(projectsArray);
     });
 
     console.log(element);
@@ -361,8 +391,6 @@ editTodoForm.addEventListener('submit', (event) => {
 
     editTodoForm.reset();
     editTodoForm.classList.add('invisible');
-
-    console.log(projectsArray);
   }
 });
 
@@ -438,9 +466,9 @@ function switchProject(valueBtn, value) {
         }
 
         checkTodo.addEventListener('click', () => {
-          changeTodoStatus(element.index, currentProjectIndex);
+          let todo = changeTodoStatus(element.index, currentProjectIndex);
 
-          if (element.status == 'Complete') {
+          if (todo.status == 'Complete') {
             checkTodo.checked = true;
             todoName.style.textDecorationLine = 'line-through';
             todoDate.style.textDecorationLine = 'line-through';
@@ -458,7 +486,6 @@ function switchProject(valueBtn, value) {
         deleteTodoBtn.addEventListener('click', () => {
           deleteTodo(currentProjectIndex, element.index);
           todoMainSpace.removeChild(todoWrapper);
-          console.log(projectsArray);
         });
 
         editTodoBtn.addEventListener('click', () => {
@@ -466,8 +493,6 @@ function switchProject(valueBtn, value) {
           todoForm.reset();
           editTodoForm.classList.remove('invisible');
           delivery = new formStorage(element.index);
-
-          console.log(projectsArray);
         });
 
         switch (element.priority) {
